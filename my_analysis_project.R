@@ -11,7 +11,7 @@ titanic.mod1 <- loglm(~ (Class * Age * Sex) + Survived, data=Titanic)
 titanic.mod1
 plot(titanic.mod1, main="Model [AGC][S]")
 
-titanic.mod2 <- update(titanic.mod1, . ~ . + Survived*(Class+Age+Sex)) #±âÁ¸ ¸ğµ¨¿¡ »õ·Î¿î term Ãß°¡
+titanic.mod2 <- update(titanic.mod1, . ~ . + Survived*(Class+Age+Sex)) #ê¸°ì¡´ ëª¨ë¸ì— ìƒˆë¡œìš´ term ì¶”ê°€
 titanic.mod2
 
 titanic.mod2 <- loglm(~ (Class * Age * Sex) + Survived*(Class + Age + Sex),data=Titanic)
@@ -23,11 +23,7 @@ titanic.mod3
 plot(titanic.mod3, main = "Model [AGC][AS][GS][CS][AGS]")
 
 
-anova(titanic.mod1, titanic.mod2, titanic.mod3, test="chisq")    #ºñ±³
-
-#½ÇÇà°á°ú
-# http://www.datavis.ca/courses/VCD/R/output/titanic-loglin.html
-
+anova(titanic.mod1, titanic.mod2, titanic.mod3, test="chisq")    #ë¹„êµ
 
 train_data2 <- train_data2 + 0.5 # adjust for 0 cells
 titanic.mod1 <- loglm(~ (Class * Age * Sex) + Survived, data=train_data2)
@@ -38,14 +34,6 @@ titanic.mod1
 
 
 #logistic model
-#http://www.utstat.toronto.edu/~guerzhoy/303/lec/lec4/logistic_regression.pdf
-
-#ÄÚµå¿Í ÇÔ²² logistic ¸ğµ¨ Âß ºñ±³. stepsize·Î ¼±Á¤ÇÏ´Â °úÁ¤µµ ÀÚ¼¼ÇÑµí.
-#https://statkclee.github.io/ml/ml-modeling-titanic.html
-
-#logistic regression
-#https://rpubs.com/zheshuen/596809
-
 
 data(titanic_test)
 library(tidyverse)
@@ -56,34 +44,32 @@ library(MASS)
 train_data <- titanic::titanic_train
 test_data <- titanic::titanic_test
 
-suppressMessages(library(readr))  #¿ÖÀÖ´ÂÁö ¸ğ¸£°ÙÀ½..
+suppressMessages(library(readr))  #ì™œìˆëŠ”ì§€ ëª¨ë¥´ê²ŸìŒ..
 suppressMessages(library(dplyr))
 
 sapply(train_data, function(x) sum(is.na(x)))
 sapply(train_data, function(x) length(unique(x)))
 suppressMessages(library(Amelia))
 
-# 2.2. °áÃø°ª¿¡ ´ëÇÑ ÀÀÂ¡
-# full data¿¡ Àû¿ë. ºĞ¼®¿¡ »ç¿ëµÉ º¯¼ö¸¸ ¼±Á¤
+#ê²°ì¸¡ê°’ì— ëŒ€í•œ ì²˜ë¦¬
+# full dataì— ì ìš©. ë¶„ì„ì— ì‚¬ìš©ë  ë³€ìˆ˜ë§Œ ì„ ì •
 
 train_data2 <- train_data %>% 
-  select(Survived, Pclass, Sex, Age, SibSp, Parch, Fare, Embarked) %>%  # °áÃø°ªÀÌ ¸¹Àº Cabin°ú ÀÌ¸§, TicketÀº Á¦°Å
-  mutate(Age = ifelse(is.na(Age), mean(Age, na.rm=TRUE), Age)) %>%  # ³ªÀÌ¸¦ Æò±Õ°ªÀ¸·Î Ä¡È¯
-  filter(!is.na(Embarked)) %>%  # °áÃø°ª 2°³ Çà Á¦°Å
-  filter(!is.na(Fare)) %>%   # °áÃø°ª 1°³ Çà Á¦°Å
-  filter(!is.na(Survived))   # °áÃø°ª 418°³ Çà Á¦°Å
+  select(Survived, Pclass, Sex, Age, SibSp, Parch, Fare, Embarked) %>%  # ê²°ì¸¡ê°’ì´ ë§ì€ Cabinê³¼ ì´ë¦„, Ticketì€ ì œê±°
+  mutate(Age = ifelse(is.na(Age), mean(Age, na.rm=TRUE), Age)) %>%  # ë‚˜ì´ë¥¼ í‰ê· ê°’ìœ¼ë¡œ ì¹˜í™˜
+  filter(!is.na(Embarked)) %>%  # ê²°ì¸¡ê°’ 2ê°œ í–‰ ì œê±°
+  filter(!is.na(Fare)) %>%   # ê²°ì¸¡ê°’ 1ê°œ í–‰ ì œê±°
+  filter(!is.na(Survived))   # ê²°ì¸¡ê°’ 418ê°œ í–‰ ì œê±°
 
 
-##========================================================
-## 03. ¸ğÇü ÀûÇÕ
-##========================================================
-## 
+
+#ëª¨ë¸ë§
+       
 suppressMessages(library(caret))
-#train_data¿¡¸¸ Àû¿ë.
+#train_dataì—ë§Œ ì ìš©.
 
 
 anova(logit.full.m, test="Chisq")
-
 
 
 
@@ -116,17 +102,17 @@ accuracy_2 <- 1-error_2
 accuracy_2
 
 
-# 3.4. ¸ğÇü Æò°¡
+# ëª¨í˜• í‰ê°€
 
 suppressMessages(library(ROCR))
-# ÀüÃ¼ ¸ğÇü
+# ì „ì²´ ëª¨í˜•
 logit.full.pred <- predict(logit.full.m, newdata=titanic.test.df, type="response")
 logit.full.pr <- prediction(logit.full.pred, titanic.test.df$Survived)
 logit.full.prf <- performance(logit.full.pr, measure = "tpr", x.measure = "fpr")
 plot(logit.full.prf)
 
 
-# ROC ¸éÀû
+# ROC ë©´ì 
 logit.full.auc <- performance(logit.full.pr, measure = "auc")
 logit.full.auc <- logit.full.auc@y.values[[1]]
 logit.full.auc
@@ -134,10 +120,7 @@ logit.full.auc
 
 
 
-##========================================================
-## 04. º¯¼ö¼±ÅÃ ¸ğÇü ¼±Á¤
-##========================================================
-## 
+#ë³€ìˆ˜ì„ íƒ ëª¨í˜• ì„ ì •
 
 logit.null.m2 <- glm(Survived ~1, family=binomial(link='logit'), data=train_data2)
 logit.full.m2 <- glm(Survived ~., family=binomial(link='logit'), data=train_data2)
@@ -155,19 +138,6 @@ logit.aic.m
 
 
 
-
-
-#ÀüÃ¼ÀûÀÎ eda ¹× ¸ğµ¨ºñ±³. rÄÚµå´Â ÀÖ´ÂÁö ¸ğ¸£°ÚÀ½-¾ø´Âµí.
-#http://people.stern.nyu.edu/jsimonof/classes/2301/pdf/titanic.pdf
-
-
-
-#EDA ½Ã°¢È­°¡ ÀßµÇ¾îÀÖÀ½
-#https://rpubs.com/mincopxkiftu2/653928
-
-
-#ÇÑ±¹¾î·Î eda ¼³¸í ¹× ½Ã°¢È­ Ä£ÀıÈ÷ º¸¿©ÁÜ. ¸ğµ¨Àº accuracyµµ ÇÑ¹ø¿¡ ³ª¿À´Â°Å°°±ä ÇÑµ¥ Àß ¸ğ¸£°ÙÀ½
-#https://rpubs.com/Ryukyungjun/Kaggle_titanic_2
 
 
 
