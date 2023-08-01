@@ -1,4 +1,6 @@
-#Model selection through comparing metrics and models
+# Model selection through comparison of Model's goodness of fit
+# Models: Independence Model, Linear Logit Model
+# Metirics: deviance residuals, Pearson residuals, and standardized Pearson residuals. 
 
 library(rsq)
 data(hcrabs)
