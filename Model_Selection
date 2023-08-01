@@ -1,3 +1,5 @@
+#Model selection through comparing metrics and models
+
 library(rsq)
 data(hcrabs)
 attach(hcrabs)
